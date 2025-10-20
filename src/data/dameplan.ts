@@ -110,8 +110,8 @@ export const SU_COEF: Record<string, [number, number]> = {
 // --- APOIO DE FOGO (APF) — DAMEPLAN CE 5.80 ---
 // Formato: "Nome (nossas|ini)": valor
 export const APF_COEF: Record<string, number> = {
-  "GAC 155 AP (1) (nossas)": 3.9,
-  "GAC 155 AP (1) (ini)":    3.9,
+  "GAC 155 AP (4 Bia) (nossas)": 3.9,
+  "GAC 155 AP (4 Bia) (ini)":    3.9,
 
   "GAC 155 AP (nossas)": 2.8,
   "GAC 155 AP (ini)":    2.8,
