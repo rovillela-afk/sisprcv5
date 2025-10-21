@@ -829,6 +829,7 @@ function PRCDetalhado({
   apfN,  // vindo do App (total Apoios Amigo)
   apfI,  // vindo do App (total Apoios Inimigo)
   meta,
+  onExport,          // ✅ NOVO
 }: {
   nossos: ElemManobra[];
   ini: ElemManobra[];
@@ -845,6 +846,7 @@ function PRCDetalhado({
     redAtac: number;
     redDef: number;
   };
+  onExport?: () => void; // ✅ NOVO
 }) {
   // ---- Tipos internos ----
   type Row = { nome: string; antes: number; depois: number; perc: number | null };
@@ -941,6 +943,15 @@ function PRCDetalhado({
     <Card title="PRC – Antes e Depois dos embates (geral e por elemento)">
       <div className="text-sm space-y-3">
         {/* Resumo geral */}
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={onExport}
+            className="px-3 py-2 text-sm rounded-xl border bg-white hover:bg-gray-50"
+            title="Exportar relatório em PDF"
+          >
+            Exportar PDF
+          </button>
+        </div>
         <div className="grid md:grid-cols-2 gap-3">
           <div className="rounded-xl border p-3 bg-white/70">
             <div className="font-medium mb-1">Geral (antes dos embates)</div>
@@ -1128,6 +1139,142 @@ export default function App() {
         const mapped = mapEng(v); // Superioridade <-> Inferioridade, Equivalência -> Equivalência
         setMultI((m) => (m.engenharia === mapped ? m : { ...m, engenharia: mapped }));
       }, [multN.engenharia]);
+
+// === Exportar PDF (resumo + projeção + (opcional) detalhamento) ===
+const exportPDF = () => {
+  const doc = new jsPDF({ unit: "pt" });
+
+  // Título
+  doc.setFontSize(14);
+  doc.text("SISPRC – Relatório", 40, 40);
+
+  // Bloco: Missão / Relação mínima / PRC atual / Status
+  const y0 = 60;
+  doc.setFontSize(11);
+  doc.text(`Missão: ${missao}`, 40, y0);
+  doc.text(`Relação mínima: ${relMin}`, 40, y0 + 18);
+  doc.text(`PRC Atual: ${numeroBonito(prcAtual)} : 1`, 40, y0 + 36);
+  doc.text(`Status: ${atende ? "ATENDE" : "NÃO atende"}`, 40, y0 + 54);
+
+  // Tabela rápida: P Cmb atual e Apoios
+  autoTable(doc, {
+    startY: y0 + 74,
+    head: [["Lado", "P Cmb", "Somatório de Apoios de Fogo"]],
+    body: [
+      ["Amigo", numeroBonito(pcN), apfN.toFixed(2)],
+      ["Inimigo", numeroBonito(pcI), apfI.toFixed(2)],
+    ],
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [0, 0, 0] },
+  });
+
+  // Projeção com degradação
+  autoTable(doc, {
+    startY: (doc as any).lastAutoTable.finalY + 18,
+    head: [["Janela (h)", "Red. Atac (%)", "Red. Def (%)", "P Cmb N", "P Cmb I", "PRC"]],
+    body: [[
+      String(horas),
+      (redAtac * 100).toFixed(0),
+      (redDef * 100).toFixed(0),
+      numeroBonito(pcN_h),
+      numeroBonito(pcI_h),
+      `${numeroBonito(prc_h)} : 1`,
+    ]],
+    styles: { fontSize: 10 },
+    headStyles: { fillColor: [20, 20, 20] },
+  });
+
+  // (Opcional) — detalhamento por elemento “ANTES x DEPOIS”
+  // Usa um build simples só para o PDF (não mexe no seu PRCDetalhado do UI):
+  const buildForPDF = (
+    side: "Nossas forças" | "Inimigo",
+    elems: ElemManobra[],
+    red: number,
+    apfTotal: number
+  ) => {
+    const multEl = document.getElementById(`mult-${side}`);
+    const media = multEl ? Number(multEl.getAttribute("data-media") || 1) : 1;
+
+    const contribElem = (e: ElemManobra) => {
+      const base =
+        (e.tipo === "GU" ? GU_COEF[e.nome] : e.tipo === "U" ? U_COEF[e.nome] : SU_COEF[e.nome]) || [0, 0];
+      const coef = e.postura === "Ofensiva" ? base[0] : base[1];
+      const vis = (VISIBILIDADE as any)[e.vis];
+      const ter = (TERRENO as any)[e.terreno];
+      const pct = clampPct(e.prcPct ?? 100) / 100;
+      return e.qtd * coef * vis * ter * pct;
+    };
+
+    const linhas = elems
+      .map((e) => {
+        const bruto = contribElem(e);
+        const antes = bruto * media;
+        const depois = antes * (1 - red);
+        const label =
+          `${e.ident && e.ident.trim() ? e.ident.trim() + " — " : ""}${limpaSufixo(e.nome)} × ${e.qtd}`;
+        return { label, antes, depois, perc: antes > 0 ? (depois / antes) * 100 : null };
+      })
+      .sort((a, b) => b.antes - a.antes);
+
+    // Apoios como linha
+    const apfAntes = apfTotal * media;
+    const apfDepois = apfAntes * (1 - red);
+    linhas.push({ label: "Apoios de Fogo (somatório)", antes: apfAntes, depois: apfDepois, perc: apfAntes ? (apfDepois / apfAntes) * 100 : null });
+
+    const totalAntes = linhas.reduce((s, r) => s + r.antes, 0);
+    const totalDepois = linhas.reduce((s, r) => s + r.depois, 0);
+
+    return {
+      totalAntes, totalDepois, linhas
+    };
+  };
+
+  // ✅ DEPOIS (usa nome diferente para não colidir com o estado "ini")
+  const nos = buildForPDF("Nossas forças", nossos, redAtac, apfN);
+  const inim = buildForPDF("Inimigo", ini, redDef, apfI);
+
+  // Tabelas de detalhamento (Amigo e Inimigo)
+  const startYDetalhe = (doc as any).lastAutoTable.finalY + 24;
+  autoTable(doc, {
+    startY: startYDetalhe,
+    head: [["AMIGO — Elemento", "Antes", "Depois", "Após (%)"]],
+    body: nos.linhas.map((r) => [
+      r.label,
+      numeroBonito(r.antes),
+      numeroBonito(r.depois),
+      r.perc == null ? "–" : `${Math.round(r.perc)}%`,
+    ]).concat([
+      ["Total", numeroBonito(nos.totalAntes), numeroBonito(nos.totalDepois), nos.totalAntes ? `${Math.round((nos.totalDepois / nos.totalAntes) * 100)}%` : "–"],
+    ]),
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [0, 80, 160] },
+  });
+
+  // ... tabela AMIGO (igual) ...
+
+  autoTable(doc, {
+    startY: (doc as any).lastAutoTable.finalY + 16,
+    head: [["INIMIGO — Elemento", "Antes", "Depois", "Após (%)"]],
+    body: inim.linhas.map((r) => [
+      r.label,
+      numeroBonito(r.antes),
+      numeroBonito(r.depois),
+      r.perc == null ? "–" : `${Math.round(r.perc)}%`,
+    ]).concat([
+      ["Total", numeroBonito(inim.totalAntes), numeroBonito(inim.totalDepois), inim.totalAntes ? `${Math.round((inim.totalDepois / inim.totalAntes) * 100)}%` : "–"],
+    ]),
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [170, 20, 20] },
+  });
+
+
+  // Rodapé
+  doc.setFontSize(9);
+  doc.text("Fonte: CE 5.80 DAMEPLAN.", 40, (doc as any).lastAutoTable.finalY + 24);
+
+  doc.save("sisprc_relatorio.pdf");
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 p-6">
@@ -1318,6 +1465,7 @@ export default function App() {
               apfN={apfN}     // 🆕
               apfI={apfI}     // 🆕
               meta={{ missao, relMin, prcAtual, atende, horas, redAtac, redDef }}
+              onExport={exportPDF}   // ✅ ADICIONE ESTA LINHA
             />
           </div>
         )}
