@@ -572,7 +572,7 @@ function Apoios({
 // ------------------------------ 3.7.9 Confrontação (GE / AAAe) ------------------------------
 const GE_COEF: Record<string, number> = {
   "BGE (nossas)": 3, "Cia GE (nossas)": 1, "Pel GE (nossas)": 0.3,
-  "BGE (ini)": 2.5, "Cia GE (ini)": 0.8, "Pel GE (ini)": 0.2,
+  "BGE (ini)": 3, "Cia GE (ini)": 1, "Pel GE (ini)": 0.3,
 };
 const AAAE_BASE: Record<string, number> = {
   "GAAAe/DE": 2.0,
