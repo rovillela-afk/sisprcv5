@@ -984,84 +984,109 @@ function PRCDetalhado({
           {/* Amigo */}
           <div>
             <div className="font-medium mb-2 text-blue-700">Amigo — por elemento</div>
-            <table className="w-full text-sm">
-              <thead className="text-left opacity-70">
-                <tr>
-                  <th className="py-1">Elemento</th>
-                  <th className="py-1 w-32">Contrib. (% do total)</th>
-                  <th className="py-1 text-right">Antes</th>
-                  <th className="py-1 text-right">Depois</th>
-                  <th className="py-1 text-right">Após (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {nos.linhas.map((r: Row, i: number) => (
-                  <tr key={i} className="border-t align-middle">
-                    <td className="py-1 pr-2 text-blue-700">
-                      <span className="inline-block max-w-[28ch] truncate align-bottom" title={r.nome}>
-                        {r.nome}
-                      </span>
-                    </td>
-                    <td className="py-1 pr-2" title={`${nos.totalAntes > 0 ? Math.round((r.antes / nos.totalAntes) * 100) : 0}% do total`}>
-                      <Bar side="amigo" frac={nos.totalAntes > 0 ? r.antes / nos.totalAntes : 0} />
-                    </td>
-                    <td className="py-1 text-right">{fmt(r.antes)}</td>
-                    <td className="py-1 text-right">{fmt(r.depois)}</td>
-                    <td className="py-1 text-right">{fmtPct(r.perc)}</td>
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <table className="w-full min-w-[640px] text-[13px] sm:text-sm table-fixed">
+                <colgroup>
+                  <col style={{ width: "45%" }} /> {/* Elemento */}
+                  <col style={{ width: "20%" }} /> {/* Contrib. */}
+                  <col style={{ width: "12%" }} /> {/* Antes */}
+                  <col style={{ width: "12%" }} /> {/* Depois */}
+                  <col style={{ width: "11%" }} /> {/* Após (%) */}
+                </colgroup>
+
+                <thead className="text-left opacity-70">
+                  <tr>
+                    <th className="py-1 pr-2">Elemento</th>
+                    <th className="py-1 pr-2 whitespace-nowrap">
+                      Contrib.<span className="hidden sm:inline"> (% do total)</span>
+                    </th>
+                    <th className="py-1 pr-2 text-right">Antes</th>
+                    <th className="py-1 pr-2 text-right">Depois</th>
+                    <th className="py-1 pr-2 text-right">Após (%)</th>
                   </tr>
-                ))}
-                <tr className="border-t font-semibold">
-                  <td className="py-1 pr-2 text-blue-700">Total</td>
-                  <td className="py-1 pr-2" />
-                  <td className="py-1 text-right">{fmt(nos.totalAntes)}</td>
-                  <td className="py-1 text-right">{fmt(nos.totalDepois)}</td>
-                  <td className="py-1 text-right">{fmtPct(nos.totalPerc)}</td>
-                </tr>
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {nos.linhas.map((r, i) => (
+                    <tr key={i} className="border-t align-middle">
+                      <td className="py-1 pr-2 text-blue-700">
+                        <span className="inline-block max-w-[24ch] truncate" title={r.nome}>
+                          {r.nome}
+                        </span>
+                      </td>
+                      <td className="py-1 pr-2">
+                        <Bar side="amigo" frac={nos.totalAntes > 0 ? r.antes / nos.totalAntes : 0} />
+                      </td>
+                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.antes)}</td>
+                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.depois)}</td>
+                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmtPct(r.perc)}</td>
+                    </tr>
+                  ))}
+                  <tr className="border-t font-semibold">
+                    <td className="py-1 pr-2 text-blue-700">Total</td>
+                    <td />
+                    <td className="py-1 pr-2 text-right">{fmt(nos.totalAntes)}</td>
+                    <td className="py-1 pr-2 text-right">{fmt(nos.totalDepois)}</td>
+                    <td className="py-1 pr-2 text-right">{fmtPct(nos.totalPerc)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Inimigo */}
           <div>
             <div className="font-medium mb-2 text-red-700">Inimigo — por elemento</div>
-            <table className="w-full text-sm">
-              <thead className="text-left opacity-70">
-                <tr>
-                  <th className="py-1">Elemento</th>
-                  <th className="py-1 w-32">Contrib. (% do total)</th>
-                  <th className="py-1 text-right">Antes</th>
-                  <th className="py-1 text-right">Depois</th>
-                  <th className="py-1 text-right">Após (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inim.linhas.map((r: Row, i: number) => (
-                  <tr key={i} className="border-t align-middle">
-                    <td className="py-1 pr-2 text-red-700">
-                      <span className="inline-block max-w-[28ch] truncate align-bottom" title={r.nome}>
-                        {r.nome}
-                      </span>
-                    </td>
-                    <td className="py-1 pr-2" title={`${inim.totalAntes > 0 ? Math.round((r.antes / inim.totalAntes) * 100) : 0}% do total`}>
-                      <Bar side="inimigo" frac={inim.totalAntes > 0 ? r.antes / inim.totalAntes : 0} />
-                    </td>
-                    <td className="py-1 text-right">{fmt(r.antes)}</td>
-                    <td className="py-1 text-right">{fmt(r.depois)}</td>
-                    <td className="py-1 text-right">{fmtPct(r.perc)}</td>
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <table className="w-full min-w-[640px] text-[13px] sm:text-sm table-fixed">
+                <colgroup>
+                  <col style={{ width: "45%" }} /> {/* Elemento */}
+                  <col style={{ width: "20%" }} /> {/* Contrib. */}
+                  <col style={{ width: "12%" }} /> {/* Antes */}
+                  <col style={{ width: "12%" }} /> {/* Depois */}
+                  <col style={{ width: "11%" }} /> {/* Após (%) */}
+                </colgroup>
+
+                <thead className="text-left opacity-70">
+                  <tr>
+                    <th className="py-1 pr-2">Elemento</th>
+                    <th className="py-1 pr-2 whitespace-nowrap">
+                      Contrib.<span className="hidden sm:inline"> (% do total)</span>
+                    </th>
+                    <th className="py-1 pr-2 text-right">Antes</th>
+                    <th className="py-1 pr-2 text-right">Depois</th>
+                    <th className="py-1 pr-2 text-right">Após (%)</th>
                   </tr>
-                ))}
-                <tr className="border-t font-semibold">
-                  <td className="py-1 pr-2 text-red-700">Total</td>
-                  <td className="py-1 pr-2" />
-                  <td className="py-1 text-right">{fmt(inim.totalAntes)}</td>
-                  <td className="py-1 text-right">{fmt(inim.totalDepois)}</td>
-                  <td className="py-1 text-right">{fmtPct(inim.totalPerc)}</td>
-                </tr>
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {inim.linhas.map((r, i) => (
+                    <tr key={i} className="border-t align-middle">
+                      <td className="py-1 pr-2 text-red-700">
+                        <span className="inline-block max-w-[24ch] truncate" title={r.nome}>
+                          {r.nome}
+                        </span>
+                      </td>
+                      <td className="py-1 pr-2">
+                        <Bar side="inimigo" frac={inim.totalAntes > 0 ? r.antes / inim.totalAntes : 0} />
+                      </td>
+                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.antes)}</td>
+                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.depois)}</td>
+                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmtPct(r.perc)}</td>
+                    </tr>
+                  ))}
+                  <tr className="border-t font-semibold">
+                    <td className="py-1 pr-2 text-red-700">Total</td>
+                    <td />
+                    <td className="py-1 pr-2 text-right">{fmt(inim.totalAntes)}</td>
+                    <td className="py-1 pr-2 text-right">{fmt(inim.totalDepois)}</td>
+                    <td className="py-1 pr-2 text-right">{fmtPct(inim.totalPerc)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-
         <div className="text-xs opacity-70">
           Nota: A coluna <i>Após (%)</i> mostra a fração preservada após a degradação
           (<code>depois ÷ antes × 100</code>), tanto por elemento quanto no total.
