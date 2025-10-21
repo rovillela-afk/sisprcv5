@@ -947,9 +947,6 @@ function PRCDetalhado({
       <div className="text-sm space-y-3">
         {/* Resumo geral */}
         <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
-          <h2 className="text-base font-medium text-gray-800">
-            PRC – Antes e Depois dos embates (geral e por elemento)
-          </h2>
           {onExport && (
             <button
               onClick={onExport}
