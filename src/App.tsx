@@ -940,7 +940,10 @@ function PRCDetalhado({
     : NaN;
 
   return (
-    <Card title="PRC – Antes e Depois dos embates (geral e por elemento)">
+    <Card
+      title="PRC – Antes e Depois dos embates (geral e por elemento)"
+      className="overflow-hidden"
+    >
       <div className="text-sm space-y-3">
         {/* Resumo geral */}
         <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
@@ -978,120 +981,126 @@ function PRCDetalhado({
             <div className="opacity-80">PRC após (% do antes): <b>{fmtPct(isNaN(prcPerc) ? null : prcPerc)}</b></div>
           </div>
         </div>
-
-        {/* Tabelas por elemento */}
-        <div className="grid md:grid-cols-2 gap-4">
-          {/* Amigo */}
-          <div>
-            <div className="font-medium mb-2 text-blue-700">Amigo — por elemento</div>
-            <div className="overflow-x-auto -mx-3 sm:mx-0">
-              <table className="w-full min-w-[640px] text-[13px] sm:text-sm table-fixed">
-                <colgroup>
-                  <col style={{ width: "45%" }} /> {/* Elemento */}
-                  <col style={{ width: "20%" }} /> {/* Contrib. */}
-                  <col style={{ width: "12%" }} /> {/* Antes */}
-                  <col style={{ width: "12%" }} /> {/* Depois */}
-                  <col style={{ width: "11%" }} /> {/* Após (%) */}
-                </colgroup>
-
-                <thead className="text-left opacity-70">
-                  <tr>
-                    <th className="py-1 pr-2">Elemento</th>
-                    <th className="py-1 pr-2 whitespace-nowrap">
-                      Contrib.<span className="hidden sm:inline"> (% do total)</span>
-                    </th>
-                    <th className="py-1 pr-2 text-right">Antes</th>
-                    <th className="py-1 pr-2 text-right">Depois</th>
-                    <th className="py-1 pr-2 text-right">Após (%)</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {nos.linhas.map((r, i) => (
-                    <tr key={i} className="border-t align-middle">
-                      <td className="py-1 pr-2 text-blue-700">
-                        <span className="inline-block max-w-[24ch] truncate" title={r.nome}>
-                          {r.nome}
-                        </span>
-                      </td>
-                      <td className="py-1 pr-2">
-                        <Bar side="amigo" frac={nos.totalAntes > 0 ? r.antes / nos.totalAntes : 0} />
-                      </td>
-                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.antes)}</td>
-                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.depois)}</td>
-                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmtPct(r.perc)}</td>
-                    </tr>
-                  ))}
-                  <tr className="border-t font-semibold">
-                    <td className="py-1 pr-2 text-blue-700">Total</td>
-                    <td />
-                    <td className="py-1 pr-2 text-right">{fmt(nos.totalAntes)}</td>
-                    <td className="py-1 pr-2 text-right">{fmt(nos.totalDepois)}</td>
-                    <td className="py-1 pr-2 text-right">{fmtPct(nos.totalPerc)}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Inimigo */}
-          <div>
-            <div className="font-medium mb-2 text-red-700">Inimigo — por elemento</div>
-            <div className="overflow-x-auto -mx-3 sm:mx-0">
-              <table className="w-full min-w-[640px] text-[13px] sm:text-sm table-fixed">
-                <colgroup>
-                  <col style={{ width: "45%" }} /> {/* Elemento */}
-                  <col style={{ width: "20%" }} /> {/* Contrib. */}
-                  <col style={{ width: "12%" }} /> {/* Antes */}
-                  <col style={{ width: "12%" }} /> {/* Depois */}
-                  <col style={{ width: "11%" }} /> {/* Após (%) */}
-                </colgroup>
-
-                <thead className="text-left opacity-70">
-                  <tr>
-                    <th className="py-1 pr-2">Elemento</th>
-                    <th className="py-1 pr-2 whitespace-nowrap">
-                      Contrib.<span className="hidden sm:inline"> (% do total)</span>
-                    </th>
-                    <th className="py-1 pr-2 text-right">Antes</th>
-                    <th className="py-1 pr-2 text-right">Depois</th>
-                    <th className="py-1 pr-2 text-right">Após (%)</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {inim.linhas.map((r, i) => (
-                    <tr key={i} className="border-t align-middle">
-                      <td className="py-1 pr-2 text-red-700">
-                        <span className="inline-block max-w-[24ch] truncate" title={r.nome}>
-                          {r.nome}
-                        </span>
-                      </td>
-                      <td className="py-1 pr-2">
-                        <Bar side="inimigo" frac={inim.totalAntes > 0 ? r.antes / inim.totalAntes : 0} />
-                      </td>
-                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.antes)}</td>
-                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.depois)}</td>
-                      <td className="py-1 pr-2 text-right whitespace-nowrap">{fmtPct(r.perc)}</td>
-                    </tr>
-                  ))}
-                  <tr className="border-t font-semibold">
-                    <td className="py-1 pr-2 text-red-700">Total</td>
-                    <td />
-                    <td className="py-1 pr-2 text-right">{fmt(inim.totalAntes)}</td>
-                    <td className="py-1 pr-2 text-right">{fmt(inim.totalDepois)}</td>
-                    <td className="py-1 pr-2 text-right">{fmtPct(inim.totalPerc)}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div className="text-xs opacity-70">
-          Nota: A coluna <i>Após (%)</i> mostra a fração preservada após a degradação
-          (<code>depois ÷ antes × 100</code>), tanto por elemento quanto no total.
-        </div>
       </div>
+        {/* Tabelas por elemento */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Amigo */}
+            <div>
+              <div className="font-medium mb-2 text-blue-700">Amigo — por elemento</div>
+
+              <div className="w-full max-w-full overflow-x-auto">
+                <div className="min-w-[520px]">
+                  <table className="w-full text-[13px] sm:text-sm table-fixed">
+                    <colgroup>
+                      <col style={{ width: "46%" }} /> {/* Elemento */}
+                      <col style={{ width: "18%" }} /> {/* Contribuição */}
+                      <col style={{ width: "12%" }} /> {/* Antes */}
+                      <col style={{ width: "12%" }} /> {/* Depois */}
+                      <col style={{ width: "12%" }} /> {/* Após (%) */}
+                    </colgroup>
+
+                    <thead className="text-left opacity-70">
+                      <tr>
+                        <th className="py-1 pr-2">Elemento</th>
+                        <th className="py-1 pr-2 whitespace-nowrap">
+                          Contrib.<span className="hidden sm:inline"> (% do total)</span>
+                        </th>
+                        <th className="py-1 pr-2 text-right">Antes</th>
+                        <th className="py-1 pr-2 text-right">Depois</th>
+                        <th className="py-1 pr-2 text-right">Após (%)</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {nos.linhas.map((r, i) => (
+                        <tr key={i} className="border-t align-middle">
+                          <td className="py-1 pr-2 text-blue-700">
+                            <span className="inline-block max-w-[24ch] truncate" title={r.nome}>
+                              {r.nome}
+                            </span>
+                          </td>
+                          <td className="py-1 pr-2">
+                            <Bar side="amigo" frac={nos.totalAntes > 0 ? r.antes / nos.totalAntes : 0} />
+                          </td>
+                          <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.antes)}</td>
+                          <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.depois)}</td>
+                          <td className="py-1 pr-2 text-right whitespace-nowrap">{fmtPct(r.perc)}</td>
+                        </tr>
+                      ))}
+                      <tr className="border-t font-semibold">
+                        <td className="py-1 pr-2 text-blue-700">Total</td>
+                        <td />
+                        <td className="py-1 pr-2 text-right">{fmt(nos.totalAntes)}</td>
+                        <td className="py-1 pr-2 text-right">{fmt(nos.totalDepois)}</td>
+                        <td className="py-1 pr-2 text-right">{fmtPct(nos.totalPerc)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div> {/* ✅ fecha a seção Amigo */}
+
+            {/* Inimigo */}
+            <div>
+              <div className="font-medium mb-2 text-red-700">Inimigo — por elemento</div>
+
+              <div className="w-full max-w-full overflow-x-auto">
+                <div className="min-w-[520px]">
+                  <table className="w-full text-[13px] sm:text-sm table-fixed">
+                    <colgroup>
+                      <col style={{ width: "46%" }} /> {/* Elemento */}
+                      <col style={{ width: "18%" }} /> {/* Contrib. */}
+                      <col style={{ width: "12%" }} /> {/* Antes */}
+                      <col style={{ width: "12%" }} /> {/* Depois */}
+                      <col style={{ width: "12%" }} /> {/* Após (%) */}
+                    </colgroup>
+
+                    <thead className="text-left opacity-70">
+                      <tr>
+                        <th className="py-1 pr-2">Elemento</th>
+                        <th className="py-1 pr-2 whitespace-nowrap">
+                          Contrib.<span className="hidden sm:inline"> (% do total)</span>
+                        </th>
+                        <th className="py-1 pr-2 text-right">Antes</th>
+                        <th className="py-1 pr-2 text-right">Depois</th>
+                        <th className="py-1 pr-2 text-right">Após (%)</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {inim.linhas.map((r, i) => (
+                        <tr key={i} className="border-t align-middle">
+                          <td className="py-1 pr-2 text-red-700">
+                            <span className="inline-block max-w-[24ch] truncate" title={r.nome}>
+                              {r.nome}
+                            </span>
+                          </td>
+                          <td className="py-1 pr-2">
+                            <Bar side="inimigo" frac={inim.totalAntes > 0 ? r.antes / inim.totalAntes : 0} />
+                          </td>
+                          <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.antes)}</td>
+                          <td className="py-1 pr-2 text-right whitespace-nowrap">{fmt(r.depois)}</td>
+                          <td className="py-1 pr-2 text-right whitespace-nowrap">{fmtPct(r.perc)}</td>
+                        </tr>
+                      ))}
+                      <tr className="border-t font-semibold">
+                        <td className="py-1 pr-2 text-red-700">Total</td>
+                        <td />
+                        <td className="py-1 pr-2 text-right">{fmt(inim.totalAntes)}</td>
+                        <td className="py-1 pr-2 text-right">{fmt(inim.totalDepois)}</td>
+                        <td className="py-1 pr-2 text-right">{fmtPct(inim.totalPerc)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div> {/* ✅ fecha a seção Inimigo */}
+          </div>  {/* ✅ fecha o grid */}
+
+          <div className="text-xs opacity-70">
+            Nota: A coluna <i>Após (%)</i> mostra a fração preservada após a degradação
+            (<code>depois ÷ antes × 100</code>), tanto por elemento quanto no total.
+          </div>
     </Card>
   );
 }
@@ -1307,7 +1316,7 @@ const exportPDF = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 p-6 overflow-x-hidden">
       <div className="max-w-screen-2xl mx-auto space-y-6 px-4">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
