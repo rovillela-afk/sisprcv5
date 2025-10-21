@@ -790,7 +790,7 @@ function ResumoOperacao({
 
 function NotasPreenchimento() {
   return (
-    <Card title="Como preencher passo a passo (siga o DAMEPLAN)">
+    <Card title="Como preencher passo a passo (em caso de dúvida siga o DAMEPLAN)">
       <ol className="text-sm list-decimal ml-5 space-y-1">
         <li>
           <b>Elementos de manobra:</b> adicione GU/U/SU de cada lado, informe <i>Qtd</i>, <i>Postura</i>,
@@ -943,14 +943,19 @@ function PRCDetalhado({
     <Card title="PRC – Antes e Depois dos embates (geral e por elemento)">
       <div className="text-sm space-y-3">
         {/* Resumo geral */}
-        <div className="flex justify-end mb-2">
-          <button
-            onClick={onExport}
-            className="px-3 py-2 text-sm rounded-xl border bg-white hover:bg-gray-50"
-            title="Exportar relatório em PDF"
-          >
-            Exportar PDF
-          </button>
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
+          <h2 className="text-base font-medium text-gray-800">
+            PRC – Antes e Depois dos embates (geral e por elemento)
+          </h2>
+          {onExport && (
+            <button
+              onClick={onExport}
+              className="px-3 py-1.5 text-sm rounded-xl border bg-white hover:bg-gray-50 whitespace-nowrap"
+              title="Exportar relatório em PDF"
+            >
+              Exportar PDF
+            </button>
+          )}
         </div>
         <div className="grid md:grid-cols-2 gap-3">
           <div className="rounded-xl border p-3 bg-white/70">
